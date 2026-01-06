@@ -13,24 +13,25 @@ import matplotlib.pyplot as plt
 
  # choosing function y=10x+43
 
-X=np.linspace(-1000,1000,10000).reshape(-1,1)
+X=np.linspace(-10000,10000,10000).reshape(-1,1)
 ##############################
 y=5*X+4
-X=X/1000  #normalizing the input data
+X=X/10000  #normalizing the input data
 #now we area adding some noise to the data
-noise=0
+noise=np.random.normal(0, 0.02, size=y.shape)
 noisyy=y+noise
 noisyy=noisyy.astype(np.float32)
-noisyy=noisyy/1000  #normalizing the output data    
+noisyy=noisyy/10000  #normalizing the output data    
 
 Model=Sequential([
-    Dense(8,activation='relu',input_shape=(1,)),
-    Dense(4,activation='relu'),
+    Dense(32,activation='relu',input_shape=(1,)),
+    Dense(16,activation='relu'),
+    Dense(8,activation='relu'),
     Dense(1)
 ]) 
-Model.compile(optimizer=Adam(learning_rate=0.001),loss=MeanSquaredError())
-X_train,X_test,y_train,y_test=train_test_split(X,noisyy,test_size=0.2,random_state=777)
-history=Model.fit(X_train,y_train,validation_data=(X_test,y_test),epochs=50,batch_size=32)
+Model.compile(optimizer=Adam(learning_rate=0.0005),loss=MeanSquaredError())
+X_train,X_test,y_train,y_test=train_test_split(X,noisyy,test_size=0.15,random_state=777)
+history=Model.fit(X_train,y_train,validation_data=(X_test,y_test),epochs=75,batch_size=40)
 plt.plot(history.history['loss'],label='Training Loss')
 plt.plot(history.history['val_loss'],label='Validation Loss')
 plt.xlabel('Epochs')
