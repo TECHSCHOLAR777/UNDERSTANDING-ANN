@@ -1,10 +1,17 @@
 import numpy as np
+import tensorflow as tf 
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.losses import MeanSquaredError
 from sklearn.model_selection import train_test_split
 import matplotlib.pyplot as plt
+
+def relative_mse(y_true, y_pred):
+    eps = 1e-6
+    return tf.reduce_mean(
+        tf.square(y_pred - y_true) / (tf.abs(y_true) + eps)
+    )
 
 
 def train_neural_network(X, y, layers, units, activations, learning_rate=0.0005, epochs=75, batch_size=32,scaling=True,test_ratio=0.2):
@@ -17,18 +24,21 @@ def train_neural_network(X, y, layers, units, activations, learning_rate=0.0005,
     
     model.compile(
         optimizer=Adam(learning_rate=learning_rate),
-        loss=MeanSquaredError()
+        loss=relative_mse # custom loss function, hum kabhi call nhi karenge directly tensorflow handle karega
     )
     
     X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=test_ratio, random_state=777)
 
     if scaling:
         maxx = X_train.max()
-        maxy = y_train.max()
+        maxy = np.max(np.abs(y_train))
         X_train = X_train / maxx
         X_val = X_val / maxx
         y_train = y_train / maxy
         y_val = y_val / maxy
+    else:
+        maxx = 1
+        maxy = 1
 
 
 

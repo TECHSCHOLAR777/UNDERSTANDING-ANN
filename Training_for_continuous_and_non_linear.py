@@ -3,7 +3,8 @@ from Standard_NN_Training_Function import train_neural_network, plot_loss_curves
 
 # Data generation
 X = np.linspace(-1000, 1000, 10000).reshape(-1, 1)                 
-y = X ** 2                   # quadratic function (already well-scaled)
+y = X ** 2 + 3 * X + 2
+
 
 
 
@@ -17,9 +18,9 @@ y_noisy = y + noise
 # Example usage of the modular functions
 model, history, maxx, maxy, X_val, y_val, valid_predictions = train_neural_network(
     X, y_noisy,
-    layers=4,
-    units=[64, 32, 16, 1],
-    activations=['relu', 'relu', 'relu', None],
+    layers=5,
+    units=[128, 64, 32, 16, 1],
+    activations=['relu', 'relu', 'relu', 'relu', None],
     learning_rate=0.0005,
     epochs=75,
     batch_size=64,
