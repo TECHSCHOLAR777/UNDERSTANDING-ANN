@@ -1,50 +1,30 @@
 import numpy as np 
-import tensorflow as tf
-from tensorflow import keras
-from tensorflow.keras import layers
-from tensorflow.keras.models import Sequential      
-from tensorflow.keras.layers import Dense   
-from tensorflow.keras.optimizers import Adam    
-from sklearn.model_selection import train_test_split    
-from tensorflow.keras.losses import MeanSquaredError
+from Standard_NN_Training_Function import train_neural_network, plot_loss_curves, plot_predictions, sample_predictions
 
-
-import matplotlib.pyplot as plt
 
  # choosing function y=10x+43
 
 X=np.linspace(-10000,10000,10000).reshape(-1,1)
 ##############################
 y=5*X+4
-X=X/10000  #normalizing the input data
-#now we area adding some noise to the data
+
 noise=np.random.normal(0, 0.02, size=y.shape)
 noisyy=y+noise
-noisyy=noisyy.astype(np.float32)
-noisyy=noisyy/10000  #normalizing the output data    
 
-Model=Sequential([
-    Dense(32,activation='relu',input_shape=(1,)),
-    Dense(16,activation='relu'),
-    Dense(8,activation='relu'),
-    Dense(1)
-]) 
-Model.compile(optimizer=Adam(learning_rate=0.0005),loss=MeanSquaredError())
-X_train,X_test,y_train,y_test=train_test_split(X,noisyy,test_size=0.15,random_state=777)
-history=Model.fit(X_train,y_train,validation_data=(X_test,y_test),epochs=75,batch_size=40)
-plt.plot(history.history['loss'],label='Training Loss')
-plt.plot(history.history['val_loss'],label='Validation Loss')
-plt.xlabel('Epochs')
-plt.ylabel('Loss')
-plt.legend()
-plt.show()
-predictions=Model.predict(X_test)
-plt.scatter(X_test,y_test,label='Noisy Data',alpha=0.3)
-plt.scatter(X_test,predictions,color='r',label='Model Predictions',alpha=0.5)
-plt.xlabel('X')
-plt.ylabel('y')
-plt.legend()
-plt.show()
-print("")
-print(X_test[:5])
-print(predictions[:5])
+model, history, maxx, maxy, X_val, y_val, valid_predictions=train_neural_network(
+    X, noisyy,
+    layers=4,
+    units=[64, 32, 16, 1],
+    activations=['relu', 'relu', 'relu', None],
+    learning_rate=0.0005,
+    epochs=75,
+    batch_size=64,
+    scaling=True,
+    test_ratio=0.2
+)   
+
+plot_loss_curves(history)
+plot_predictions(X_val, y_val, valid_predictions, maxx, maxy)
+sample_predictions(X_val, y_val, valid_predictions, maxx, maxy, n=5)
+print("Model Summary:")
+model.summary()
